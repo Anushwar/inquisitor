@@ -1,13 +1,31 @@
+import Bubble from '../bubble';
 import { Button } from '../button';
 import { Input } from '../input';
 import { SendHorizontal } from 'lucide-react';
+
+const mock = [
+  {
+    sender: 'bot',
+    content: 'Hey There!!',
+  },
+  {
+    sender: 'user',
+    content: 'Hi! How are you?',
+  },
+  {
+    sender: 'bot',
+    content: 'Never been better!',
+  },
+];
 
 const Chat = () => {
   return (
     <div className="px-4 w-[80%] border-l py-2 space-y-4 overflow-hidden">
       <div className="py-4" />
-      <div className="h-[86%] py-4 flex flex-col justify-center items-center">
-        Chat Area
+      <div className="h-[86%] w-full py-4 space-y-4 overflow-scroll">
+        {mock.map(({ sender, content }, index) => (
+          <Bubble key={sender + index} sender={sender} content={content} />
+        ))}
       </div>
       <div className="h-[15%] relative py-4">
         <Input
