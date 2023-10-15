@@ -1,33 +1,33 @@
 import { User, Bot } from 'lucide-react';
 
 interface BubbleProps extends React.HTMLAttributes<HTMLDivElement> {
-  sender: string;
+  role: string;
   content: string;
 }
 
-const Bubble = ({ sender, content, ...rest }: BubbleProps) => {
+const Bubble = ({ role, content, ...rest }: BubbleProps) => {
   return (
     <div
-      key={sender}
+      key={role}
       className={`flex py-4 mb-4 ${
-        sender === 'user' ? 'justify-end' : 'justify-start'
+        role !== 'assistant' ? 'justify-end' : 'justify-start'
       }`}
       {...rest}
     >
       <div
         className={`flex ${
-          sender === 'user' ? 'flex-row-reverse' : 'flex-row'
+          role !== 'assistant' ? 'flex-row-reverse' : 'flex-row'
         }`}
       >
-        {sender === 'user' ? (
+        {role !== 'assistant' ? (
           <User className="w-8 h-8 rounded-full" />
         ) : (
           <Bot className="w-8 h-8 rounded-full" />
         )}
 
         <div
-          className={`p-4 max-w-xs mx-2 ${
-            sender === 'user'
+          className={`p-4 max-w-lg mx-2 ${
+            role !== 'assistant'
               ? 'bg-[#5E5ADB] text-white rounded-l-lg rounded-br-lg'
               : 'bg-gray-200 rounded-r-lg rounded-bl-lg'
           }`}
