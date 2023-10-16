@@ -14,6 +14,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.inquisitor.inquisitor.dto.GPTRequest;
 import com.inquisitor.inquisitor.dto.GPTResponse;
+import com.inquisitor.inquisitor.dto.Message;
 
 @RestController
 @RequestMapping("/gpt")
@@ -29,18 +30,18 @@ public class InquisitorController {
     private RestTemplate template;
 
     @GetMapping("/chat")
-    public String gptResponse(@RequestParam("prompt") String prompt) {
+    public Message gptResponse(@RequestParam("prompt") String prompt) {
         GPTRequest request = new GPTRequest(model, prompt);
         GPTResponse response = template.postForObject(baseUrl, request, GPTResponse.class);
 
         if (response != null)
-            return response.getChoices().get(0).getMessage().getContent();
+            return response.getChoices().get(0).getMessage();
         else
             throw new Error("Error! No response.");
     }
 
     @PostMapping("/process")
-    public String processFileUpload(@RequestParam("file") MultipartFile file) {
+    public Message processFileUpload(@RequestParam("file") MultipartFile file, @RequestParam("prompt") String prompt) {
         // Check if the file is empty
         if (file.isEmpty()) {
             throw new Error("Please upload a CSV file!");
@@ -48,11 +49,11 @@ public class InquisitorController {
 
         try {
             String parsedCSV = parseCSV(file);
-            GPTRequest request = new GPTRequest(model, parsedCSV);
+            GPTRequest request = new GPTRequest(model, parsedCSV + " " + prompt);
             GPTResponse response = template.postForObject(baseUrl, request, GPTResponse.class);
 
             if (response != null)
-                return response.getChoices().get(0).getMessage().getContent();
+                return response.getChoices().get(0).getMessage();
             else
                 throw new Error("Error! No response.");
         } catch (IOException e) {
