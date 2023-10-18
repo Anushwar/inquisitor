@@ -4,6 +4,7 @@ import { Button } from '../button';
 import { Input } from '../input';
 import { Trash, Paperclip, SendHorizontal } from 'lucide-react';
 import { fetchCSVResult, fetchPrompt } from '@/api/gpt';
+import { useToast } from '@/hooks/use-toast';
 
 interface ChatProps {
   role: string;
@@ -16,6 +17,7 @@ const Chat = () => {
   const [log, setLog] = useState<ChatProps[]>([]);
   const [file, setFile] = useState<File | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const { toast } = useToast();
 
   const generateResponse = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -40,16 +42,21 @@ const Chat = () => {
     setFile(null);
     setLoading(true);
 
-    try {
-      const res = formData?.entries().next().done
-        ? await fetchPrompt(content)
-        : await fetchCSVResult(formData);
+    const res = formData?.entries().next().done
+      ? await fetchPrompt(content)
+      : await fetchCSVResult(formData);
+
+    if (res.status >= 200 && res.status < 300)
       setLog((previous) => [...previous, res]);
-    } catch {
-      //
-    } finally {
-      setLoading(false);
-    }
+    else
+      toast({
+        title: 'Error!',
+        description: 'Error generating prompt!',
+        variant: 'destructive',
+        dir: 'top',
+      });
+
+    setLoading(false);
   };
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -88,7 +95,7 @@ const Chat = () => {
           name="prompt"
           type="text"
           required
-          className="h-[50%] text-md"
+          className="h-[50%] w-[85%] text-md"
           placeholder="Enter your query here (You can also input a CSV file along with your prompt)."
           disabled={loading ? true : false}
         />
