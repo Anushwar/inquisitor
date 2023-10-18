@@ -66,13 +66,24 @@ const Chat = () => {
     }
   };
 
+  console.log(log.length);
+
   return (
     <div className="px-4 w-[80%] border-l py-2 space-y-4 overflow-hidden">
       <div className="py-4" />
       <div className="h-[86%] w-full py-4 space-y-4 overflow-scroll">
-        {log.map(({ role, content, file }, index) => (
-          <Bubble key={index} role={role} content={content} file={file} />
-        ))}
+        {log.length === 0 ? (
+          <div className="flex justify-center w-full">
+            <div className="max-w-md bg-slate-100 border text-center rounded-md border-slate-400 p-2 font-medium">
+              Please input a CSV file and/or enter a prompt to get started.
+              <br />
+            </div>
+          </div>
+        ) : (
+          log.map(({ role, content, file }, index) => (
+            <Bubble key={index} role={role} content={content} file={file} />
+          ))
+        )}
       </div>
       <form
         onSubmit={(e) => {
