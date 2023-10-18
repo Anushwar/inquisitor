@@ -1,4 +1,4 @@
-import { Button } from '../button';
+import { Button } from '../ui/button';
 import { Plus, MessageSquare } from 'lucide-react';
 
 const Logs = () => {

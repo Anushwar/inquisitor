@@ -1,7 +1,7 @@
 import { useRef, useState } from 'react';
-import Bubble from '../bubble';
-import { Button } from '../button';
-import { Input } from '../input';
+import Bubble from '../ui/bubble';
+import { Button } from '../ui/button';
+import { Input } from '../ui/input';
 import { Trash, Paperclip, SendHorizontal } from 'lucide-react';
 import { fetchCSVResult, fetchPrompt } from '@/api/gpt';
 import { useToast } from '@/hooks/use-toast';
