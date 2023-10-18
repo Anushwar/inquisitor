@@ -66,8 +66,6 @@ const Chat = () => {
     }
   };
 
-  console.log(log.length);
-
   return (
     <div className="px-4 w-[80%] border-l py-2 space-y-4 overflow-hidden">
       <div className="py-4" />
