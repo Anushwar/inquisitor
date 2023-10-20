@@ -46,8 +46,7 @@ const Chat = () => {
       ? await fetchPrompt(content)
       : await fetchCSVResult(formData);
 
-    if (res.status >= 200 && res.status < 300)
-      setLog((previous) => [...previous, res]);
+    if (!res?.error) setLog((previous) => [...previous, res]);
     else
       toast({
         title: 'Error!',
