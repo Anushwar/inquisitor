@@ -1,9 +1,10 @@
 import { useRef, useState } from 'react';
-import Bubble from '../bubble';
-import { Button } from '../button';
-import { Input } from '../input';
+import Bubble from '../ui/bubble';
+import { Button } from '../ui/button';
+import { Input } from '../ui/input';
 import { Trash, Paperclip, SendHorizontal } from 'lucide-react';
 import { fetchCSVResult, fetchPrompt } from '@/api/gpt';
+import { useToast } from '@/hooks/use-toast';
 
 interface ChatProps {
   role: string;
@@ -16,6 +17,7 @@ const Chat = () => {
   const [log, setLog] = useState<ChatProps[]>([]);
   const [file, setFile] = useState<File | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const { toast } = useToast();
 
   const generateResponse = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -40,16 +42,20 @@ const Chat = () => {
     setFile(null);
     setLoading(true);
 
-    try {
-      const res = formData?.entries().next().done
-        ? await fetchPrompt(content)
-        : await fetchCSVResult(formData);
-      setLog((previous) => [...previous, res]);
-    } catch {
-      //
-    } finally {
-      setLoading(false);
-    }
+    const res = formData?.entries().next().done
+      ? await fetchPrompt(content)
+      : await fetchCSVResult(formData);
+
+    if (!res?.error) setLog((previous) => [...previous, res]);
+    else
+      toast({
+        title: 'Error!',
+        description: 'Error generating prompt!',
+        variant: 'destructive',
+        dir: 'top',
+      });
+
+    setLoading(false);
   };
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -63,9 +69,18 @@ const Chat = () => {
     <div className="px-4 w-[80%] border-l py-2 space-y-4 overflow-hidden">
       <div className="py-4" />
       <div className="h-[86%] w-full py-4 space-y-4 overflow-scroll">
-        {log.map(({ role, content, file }, index) => (
-          <Bubble key={index} role={role} content={content} file={file} />
-        ))}
+        {log.length === 0 ? (
+          <div className="flex justify-center w-full">
+            <div className="max-w-md bg-slate-100 border text-center rounded-md border-slate-400 p-2 font-medium">
+              Please input a CSV file and/or enter a prompt to get started.
+              <br />
+            </div>
+          </div>
+        ) : (
+          log.map(({ role, content, file }, index) => (
+            <Bubble key={index} role={role} content={content} file={file} />
+          ))
+        )}
       </div>
       <form
         onSubmit={(e) => {
@@ -88,7 +103,7 @@ const Chat = () => {
           name="prompt"
           type="text"
           required
-          className="h-[50%] text-md"
+          className="h-[50%] w-[85%] text-md"
           placeholder="Enter your query here (You can also input a CSV file along with your prompt)."
           disabled={loading ? true : false}
         />

@@ -35,7 +35,7 @@ const Bubble = ({ role, content, file, ...rest }: BubbleProps) => {
         >
           {file && (
             <>
-              <div className="border flex flex-row items-center border-green-300 bg-green-100 p-2 rounded-md text-green-800 font-bold">
+              <div className="border flex flex-row justify-between gap-2 items-center border-green-300 bg-green-100 p-2 rounded-md text-green-800 font-bold">
                 <Paperclip className="w-4 h-4" />
                 {file}
               </div>

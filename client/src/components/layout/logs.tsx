@@ -1,11 +1,12 @@
-import { Button } from '../button';
+import { Button } from '../ui/button';
 import { Plus, MessageSquare } from 'lucide-react';
 
 const Logs = () => {
   return (
     <div className="px-4 w-[20%] border-r py-2 space-y-4">
       <div className="border-b-2 py-4">
-        <div className="px-2">
+        <div className="px-2 flex flex-row items-center gap-5">
+          <img src="https://img.logoipsum.com/281.svg" />
           <h2 className="text-xl font-bold">Inquisitor</h2>
         </div>
       </div>
