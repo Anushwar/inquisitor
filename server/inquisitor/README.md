@@ -1,6 +1,4 @@
-# Inquisitor
-
-## Description
+# Inquisitor Server
 
 Server for Inquisitor. It is set up using Spring Initializer, utilizes Maven for dependency management.
 
