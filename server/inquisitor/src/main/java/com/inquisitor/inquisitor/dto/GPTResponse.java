@@ -4,6 +4,7 @@ import java.util.List;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 @Data
@@ -18,7 +19,19 @@ public class GPTResponse {
     @NoArgsConstructor
     public static class Choice {
         private int index;
-        private Message message;
+        private ResponseMessage message;
+
+        @Data
+        @EqualsAndHashCode(callSuper = false)
+        public class ResponseMessage extends Message {
+            private Func function_call;
+
+            @Data
+            public class Func {
+                private String name;
+                private String arguments;
+            }
+        }
     }
 
 }
