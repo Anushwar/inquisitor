@@ -1,12 +1,19 @@
 import { Paperclip, User, Bot } from 'lucide-react';
+import Chart from './chart';
 
 interface BubbleProps extends React.HTMLAttributes<HTMLDivElement> {
   role: string;
   content: string;
   file?: string;
+  graph?: {
+    xField: string;
+    yField: string;
+    graph_type: string;
+    data: unknown[];
+  };
 }
 
-const Bubble = ({ role, content, file, ...rest }: BubbleProps) => {
+const Bubble = ({ role, content, file, graph, ...rest }: BubbleProps) => {
   return (
     <div
       key={role}
@@ -27,7 +34,7 @@ const Bubble = ({ role, content, file, ...rest }: BubbleProps) => {
         )}
 
         <div
-          className={`p-4 max-w-2xl mx-2 whitespace-pre-line ${
+          className={`p-4 max-w-xl w-full mx-2 whitespace-pre-line ${
             role !== 'assistant'
               ? 'bg-[#5E5ADB] text-white rounded-l-lg rounded-br-lg'
               : 'bg-gray-200 rounded-r-lg rounded-bl-lg'
@@ -42,7 +49,8 @@ const Bubble = ({ role, content, file, ...rest }: BubbleProps) => {
               <br />
             </>
           )}
-          {content}
+          <span>{content}</span>
+          {graph?.data && graph?.data?.length > 0 && <Chart {...graph} />}
         </div>
       </div>
     </div>

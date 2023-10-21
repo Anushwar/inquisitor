@@ -5,11 +5,19 @@ import { Input } from '../ui/input';
 import { Trash, Paperclip, SendHorizontal } from 'lucide-react';
 import { fetchCSVResult, fetchPrompt } from '@/api/gpt';
 import { useToast } from '@/hooks/use-toast';
+import { parseConfig } from '@/utils';
+import Papa from 'papaparse';
 
 interface ChatProps {
   role: string;
   content: string;
   file?: string;
+  graph?: {
+    xField: string;
+    yField: string;
+    graph_type: string;
+    data: unknown[];
+  };
 }
 
 const Chat = () => {
@@ -17,6 +25,7 @@ const Chat = () => {
   const [log, setLog] = useState<ChatProps[]>([]);
   const [file, setFile] = useState<File | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [parsedFile, setParsedFile] = useState<unknown[]>([]);
   const { toast } = useToast();
 
   const generateResponse = async (event: React.FormEvent<HTMLFormElement>) => {
@@ -42,18 +51,33 @@ const Chat = () => {
     setFile(null);
     setLoading(true);
 
-    const res = formData?.entries().next().done
-      ? await fetchPrompt(content)
-      : await fetchCSVResult(formData);
+    try {
+      const res = formData?.entries().next().done
+        ? await fetchPrompt(content)
+        : await fetchCSVResult(formData);
 
-    if (!res?.error) setLog((previous) => [...previous, res]);
-    else
+      res?.function_call
+        ? setLog((prev) => [
+            ...prev,
+            {
+              role: 'assistant',
+              content:
+                'Referring to the data from the csv, check out the visualisation below.',
+              graph: {
+                ...parseConfig(JSON.parse(res?.function_call.arguments)),
+                data: [...parsedFile],
+              },
+            },
+          ])
+        : setLog((previous) => [...previous, res]);
+    } catch {
       toast({
         title: 'Error!',
         description: 'Error generating prompt!',
         variant: 'destructive',
         dir: 'top',
       });
+    }
 
     setLoading(false);
   };
@@ -62,6 +86,12 @@ const Chat = () => {
     const uploadedFile = event.target.files?.[0];
     if (uploadedFile) {
       setFile(uploadedFile);
+      Papa.parse(uploadedFile, {
+        complete: (result) => {
+          setParsedFile(result?.data);
+        },
+        header: true,
+      });
     }
   };
 
@@ -77,11 +107,18 @@ const Chat = () => {
             </div>
           </div>
         ) : (
-          log.map(({ role, content, file }, index) => (
-            <Bubble key={index} role={role} content={content} file={file} />
+          log.map(({ role, content, file, graph }, index) => (
+            <Bubble
+              key={index}
+              role={role}
+              content={content}
+              file={file}
+              graph={graph}
+            />
           ))
         )}
       </div>
+
       <form
         onSubmit={(e) => {
           generateResponse(e);
@@ -102,7 +139,7 @@ const Chat = () => {
           id="prompt"
           name="prompt"
           type="text"
-          required
+          required={file === null}
           className="h-[50%] w-[85%] text-md"
           placeholder="Enter your query here (You can also input a CSV file along with your prompt)."
           disabled={loading ? true : false}

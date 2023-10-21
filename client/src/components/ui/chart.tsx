@@ -4,10 +4,11 @@ import type { LineConfig, BarConfig, PieConfig } from '@ant-design/plots';
 interface ChartProps {
   xField: string;
   yField: string;
+  graph_type: string;
   data: unknown;
 }
 
-const Chart = ({ xField, yField, data }: ChartProps) => {
+const Chart = ({ xField, yField, graph_type, data }: ChartProps) => {
   const config = {
     data,
     padding: 'auto',
@@ -39,7 +40,7 @@ const Chart = ({ xField, yField, data }: ChartProps) => {
     }
   };
 
-  return generateGraph('pie');
+  return generateGraph(graph_type);
 };
 
 export default Chart;
